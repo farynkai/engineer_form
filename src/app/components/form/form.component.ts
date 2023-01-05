@@ -4,12 +4,14 @@ import {
   FormGroup,
   FormBuilder,
   Validators,
+  FormArray,
 } from '@angular/forms';
 import { takeUntil } from 'rxjs';
 import { DatePipe } from '@angular/common';
 
 import { UnsubscriberComponent } from '../unsubscriber/unsubscriber.component';
 import { EngineerInputDto } from './../../dto/engineer-input.dto';
+import { FormService } from './../../services/form.service';
 
 @Component({
   selector: 'app-form',
@@ -25,7 +27,11 @@ export class FormComponent extends UnsubscriberComponent {
     return this.engineerForm.controls;
   }
 
-  constructor(private fb: FormBuilder, private datePipe: DatePipe) {
+  constructor(
+    private fb: FormBuilder,
+    private datePipe: DatePipe,
+    private formService: FormService
+  ) {
     super();
     this.initFilterForm();
   }
@@ -38,8 +44,7 @@ export class FormComponent extends UnsubscriberComponent {
       framework: ['', Validators.required],
       frameworkVersion: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      hobbieName: ['', Validators.required],
-      hobbieDuration: ['', Validators.required],
+      hobbies: this.fb.array([this.newHobbieGroup()]),
     });
 
     this.engineerForm.valueChanges
@@ -60,27 +65,34 @@ export class FormComponent extends UnsubscriberComponent {
       });
   }
 
-  engineerFormToRequest(): EngineerInputDto {
-    return {
-      firstName: this.engineerFormControls['firstName'].value,
-      lastName: this.engineerFormControls['lastName'].value,
-      dateOfBirth: this.datePipe.transform(
-        new Date(this.engineerFormControls['dateOfBirth'].value),
-        'yyyy-MM-dd'
-      ),
-      framework: this.engineerFormControls['framework'].value,
-      frameworkVersion: this.engineerFormControls['frameworkVersion'].value,
-      email: this.engineerFormControls['email'].value,
-      hobbies: [
-        {
-          name: this.engineerFormControls['hobbieName'].value,
-          duration: this.engineerFormControls['hobbieDuration'].value,
-        },
-      ],
-    };
+  hobbies(): FormArray {
+    return this.engineerForm.get('hobbies') as FormArray;
   }
 
-  onSubmit() {
-    console.log(this.engineerFormToRequest());
+  newHobbieGroup(): FormGroup {
+    return this.fb.group({
+      hobbieName: ['', Validators.required],
+      hobbieDuration: ['', Validators.required],
+    });
+  }
+
+  addHobbie(): void {
+    this.hobbies().push(this.newHobbieGroup());
+  }
+
+  removeHobbie(i: number) {
+    this.hobbies().removeAt(i);
+  }
+
+  // engineerFormToRequest(): EngineerInputDto {
+  //   this.datePipe.transform(
+  //     new Date(this.engineerFormControls['dateOfBirth'].value),
+  //     'yyyy-MM-dd'
+  //   );
+  //   return this.engineerForm.value;
+  // }
+
+  createEngineer(engineerInfo: EngineerInputDto) {
+    this.formService.createUser(engineerInfo).subscribe();
   }
 }

@@ -1,6 +1,6 @@
 <div class="container">
   <h1 class="title">Engineer Form</h1>
-  <form [formGroup]="engineerForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="engineerForm" (ngSubmit)="createEngineer(engineerForm.value)">
     <h3 class="block-title">Personal information:</h3>
     <div class="base-info-block">
       <div>
@@ -82,29 +82,33 @@
     </div>
 
     <h3 class="block-title">Hobbies information:</h3>
-   
-      <button mat-fab color="primary" class="add-btn">
-        <mat-icon>add</mat-icon>
-      </button>
-   
-    <div class="hobbies-block">
-      <div>
-        <mat-form-field appearance="outline" class="block-input ">
-          <mat-label>Name</mat-label>
-          <input matInput formControlName="hobbieName" >
-        </mat-form-field>
-        <mat-error *ngIf="engineerForm.get('hobbieName')?.hasError('required') && engineerForm.get('hobbieName')?.touched">Hobbie name is required</mat-error>
-      </div>
+    <div class="btn-block">
+      <div>Add hobbie</div>
+      <button type="button" mat-flat-button color="accent" (click)="addHobbie()">Add</button>
+    </div>
+    <div formArrayName="hobbies" *ngFor="let hobbie of hobbies().controls; let i=index" >
+      <div class="hobbies-block" [formGroupName]="i">
+        <div>
+          <mat-form-field appearance="outline" class="block-input">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="hobbieName">
+          </mat-form-field>
+          <mat-error *ngIf="engineerForm.get('hobbieName')?.hasError('required') && engineerForm.get('hobbieName')?.touched">Hobbie name is required</mat-error>
+        </div>
 
-      <div>
-        <mat-form-field appearance="outline" class="block-input">
-          <mat-label>Duration</mat-label>
-          <input matInput formControlName="hobbieDuration">
-        </mat-form-field>
-        <mat-error *ngIf="engineerForm.get('hobbieDuration')?.hasError('required') && engineerForm.get('hobbieDuration')?.touched">Hobbie duration is required</mat-error>
+        <div>
+          <mat-form-field appearance="outline" class="block-input">
+            <mat-label>Duration</mat-label>
+            <input matInput formControlName="hobbieDuration">
+          </mat-form-field>
+          <mat-error *ngIf="engineerForm.get('hobbieDuration')?.hasError('required') && engineerForm.get('hobbieDuration')?.touched">Hobbie duration is required</mat-error>
+        </div>
+      </div>
+      <div class="btn-block" *ngIf="hobbies().length > 1">
+        <div>Delete hobbie</div>
+        <button type="button" mat-flat-button color="warn" (click)="removeHobbie(i)">Remove</button>
       </div>
     </div>
-    
-    <button mat-flat-button color="primary">Submit</button>
+    <button type="submit" mat-flat-button color="primary">Submit</button>
   </form>
 </div>

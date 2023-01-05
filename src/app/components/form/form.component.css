@@ -13,7 +13,7 @@
     font-weight: 500;
 }
 
-.base-info-block, .framework-block, .hobbies-block{
+.base-info-block, .framework-block, .hobbies-block, .btn-block{
     display: flex;
     justify-content: space-between;
 }
@@ -26,19 +26,15 @@
     width: 420px;
 }
 
-.add-hobbie-block {
-    display: flex;
+.btn-block {
+    margin-bottom: 20px;
     align-items: center;
-}
-
-.add-text {
     font-size: 18px;
     font-weight: 400;
-    margin-right: 10px;
 }
 
-.add-btn {
-    width: 30px;
-    height: 30px;
-    margin: 0 0 10px;
+button {
+    width:100px;
 }
+
+
