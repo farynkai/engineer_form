@@ -36,7 +36,8 @@
           <mat-form-field appearance="outline" class="block-input">
             <mat-label>Email</mat-label>
             <input matInput formControlName="email">
-            <mat-error *ngIf="(engineerForm.get('email')?.invalid && engineerForm.get('email')?.touched) || engineerForm.get('email')?.dirty">Email address is invalid</mat-error>
+            <mat-error *ngIf="(engineerForm.get('email')?.hasError('email') && engineerForm.get('email')?.touched) || engineerForm.get('email')?.hasError('required')">Email address is invalid</mat-error>
+            <mat-error *ngIf="engineerForm.get('email')?.hasError('emailTaken')">Email is taken</mat-error>
           </mat-form-field>
         </div>
       </div>

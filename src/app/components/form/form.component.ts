@@ -7,7 +7,6 @@ import {
   FormArray,
 } from '@angular/forms';
 import { takeUntil } from 'rxjs';
-import { DatePipe } from '@angular/common';
 
 import { UnsubscriberComponent } from '../unsubscriber/unsubscriber.component';
 import { EngineerInputDto } from './../../dto/engineer-input.dto';
@@ -27,11 +26,7 @@ export class FormComponent extends UnsubscriberComponent {
     return this.engineerForm.controls;
   }
 
-  constructor(
-    private fb: FormBuilder,
-    private datePipe: DatePipe,
-    private formService: FormService
-  ) {
+  constructor(private fb: FormBuilder, private formService: FormService) {
     super();
     this.initFilterForm();
   }
@@ -43,7 +38,11 @@ export class FormComponent extends UnsubscriberComponent {
       dateOfBirth: ['', Validators.required],
       framework: ['', Validators.required],
       frameworkVersion: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      email: [
+        '',
+        [Validators.required, Validators.email],
+        this.formService.validateEmailNotTaken.bind(this.formService),
+      ],
       hobbies: this.fb.array([this.newHobbieGroup()]),
     });
 
@@ -80,19 +79,16 @@ export class FormComponent extends UnsubscriberComponent {
     this.hobbies().push(this.newHobbieGroup());
   }
 
-  removeHobbie(i: number) {
+  removeHobbie(i: number): void {
     this.hobbies().removeAt(i);
   }
 
-  // engineerFormToRequest(): EngineerInputDto {
-  //   this.datePipe.transform(
-  //     new Date(this.engineerFormControls['dateOfBirth'].value),
-  //     'yyyy-MM-dd'
-  //   );
-  //   return this.engineerForm.value;
-  // }
-
-  createEngineer(engineerInfo: EngineerInputDto) {
-    this.formService.createUser(engineerInfo).subscribe();
+  createEngineer(engineerInfo: EngineerInputDto): void {
+    if (this.engineerForm.valid) {
+      this.formService
+        .createUser(engineerInfo)
+        .pipe(takeUntil(this.destroyed$))
+        .subscribe();
+    }
   }
 }

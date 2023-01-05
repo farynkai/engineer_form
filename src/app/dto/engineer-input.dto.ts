@@ -1,7 +1,7 @@
 export interface EngineerInputDto {
   firstName: string;
   lastName: string;
-  dateOfBirth: null | string;
+  dateOfBirth: string;
   framework: string;
   frameworkVersion: string;
   email: string;
