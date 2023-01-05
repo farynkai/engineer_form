@@ -82,6 +82,11 @@
     </div>
 
     <h3 class="block-title">Hobbies information:</h3>
+   
+      <button mat-fab color="primary" class="add-btn">
+        <mat-icon>add</mat-icon>
+      </button>
+   
     <div class="hobbies-block">
       <div>
         <mat-form-field appearance="outline" class="block-input ">
@@ -99,7 +104,7 @@
         <mat-error *ngIf="engineerForm.get('hobbieDuration')?.hasError('required') && engineerForm.get('hobbieDuration')?.touched">Hobbie duration is required</mat-error>
       </div>
     </div>
-
+    
     <button mat-flat-button color="primary">Submit</button>
   </form>
 </div>
