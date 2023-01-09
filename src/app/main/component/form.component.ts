@@ -1,16 +1,11 @@
 import { Component } from '@angular/core';
-import {
-  AbstractControl,
-  FormGroup,
-  FormBuilder,
-  Validators,
-  FormArray,
-} from '@angular/forms';
+import { AbstractControl, FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { takeUntil } from 'rxjs';
 
-import { UnsubscriberComponent } from '../unsubscriber/unsubscriber.component';
-import { EngineerInputDto } from './../../dto/engineer-input.dto';
-import { FormService } from './../../services/form.service';
+import { FormService } from '../../shared/services/form.service';
+import { ToastService } from '../../shared/services/toast.service';
+import { UnsubscriberComponent } from '../../shared/unsubscriber.component';
+import { EngineerInputDto } from '../../shared/dto/engineer-input.dto';
 
 @Component({
   selector: 'app-form',
@@ -21,12 +16,13 @@ export class FormComponent extends UnsubscriberComponent {
   engineerForm!: FormGroup;
   isChoosen = false;
   frameworkVersion = '';
+  frameworks = ['angular', 'react', 'vue'];
 
   get engineerFormControls(): { [key: string]: AbstractControl } {
     return this.engineerForm.controls;
   }
 
-  constructor(private fb: FormBuilder, private formService: FormService) {
+  constructor(private fb: FormBuilder, private formService: FormService, private toastService: ToastService) {
     super();
     this.initFilterForm();
   }
@@ -35,33 +31,21 @@ export class FormComponent extends UnsubscriberComponent {
     this.engineerForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      dateOfBirth: ['', Validators.required],
+      dateOfBirth: ['', [Validators.required, this.formService.validateDate]],
       framework: ['', Validators.required],
       frameworkVersion: ['', Validators.required],
-      email: [
-        '',
-        [Validators.required, Validators.email],
-        this.formService.validateEmailNotTaken.bind(this.formService),
-      ],
+      email: ['', [Validators.required, Validators.email], this.formService.validateEmailNotTaken.bind(this.formService)],
       hobbies: this.fb.array([this.newHobbieGroup()]),
     });
 
-    this.engineerForm.valueChanges
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(() => {
-        if (this.engineerFormControls['framework'].value === 'vue') {
-          this.isChoosen = true;
-          this.frameworkVersion = 'vue';
-        }
-        if (this.engineerFormControls['framework'].value === 'react') {
-          this.isChoosen = true;
-          this.frameworkVersion = 'react';
-        }
-        if (this.engineerFormControls['framework'].value === 'angular') {
-          this.isChoosen = true;
-          this.frameworkVersion = 'angular';
-        }
-      });
+    this.engineerForm.valueChanges.pipe(
+      takeUntil(this.destroyed$)
+    ).subscribe(() => {
+      if (this.engineerFormControls['framework'].value) {
+        this.isChoosen = true;
+        this.frameworkVersion = this.engineerFormControls['framework'].value;
+      }
+    });
   }
 
   hobbies(): FormArray {
@@ -85,10 +69,11 @@ export class FormComponent extends UnsubscriberComponent {
 
   createEngineer(engineerInfo: EngineerInputDto): void {
     if (this.engineerForm.valid) {
-      this.formService
-        .createUser(engineerInfo)
-        .pipe(takeUntil(this.destroyed$))
-        .subscribe();
+      this.toastService.successfulRegistration(engineerInfo.firstName);
+      this.formService.createUser(engineerInfo).pipe(
+        takeUntil(this.destroyed$)
+      ).subscribe();
+      this.engineerForm.reset()
     }
   }
 }
