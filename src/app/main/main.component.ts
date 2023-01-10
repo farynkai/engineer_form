@@ -2,22 +2,25 @@ import { Component } from '@angular/core';
 import { AbstractControl, FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { takeUntil } from 'rxjs';
 
-import { FormService } from '../../shared/services/form.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { UnsubscriberComponent } from '../../shared/unsubscriber.component';
-import { EngineerInputDto } from '../../shared/dto/engineer-input.dto';
-
+import { ToastService } from '../shared/services/toast.service';
+import { FormService } from './main.service';
+import { UnsubscriberComponent } from '../shared/unsubscriber.component';
+import { EngineerInputDto } from '../shared/dto/engineer-input.dto';
 @Component({
   selector: 'app-form',
-  templateUrl: './form.component.html',
-  styleUrls: ['./form.component.css'],
+  templateUrl: './main.component.html',
+  styleUrls: ['./main.component.css'],
 })
-export class FormComponent extends UnsubscriberComponent {
+export class MainComponent extends UnsubscriberComponent {
   engineerForm!: FormGroup;
   isChoosen = false;
   frameworkVersion = '';
-  frameworks = ['angular', 'react', 'vue'];
-
+  frameworksVersion: { [key: string]: string[] } = {
+    angular: ['1.1.1', '1.2.1', '1.3.3'],
+    react: ['2.1.2', '3.2.4', '4.3.1'],
+    vue: ['3.3.1', '5.2.1', '5.1.3']
+  };
+  frameworks = Object.keys(this.frameworksVersion);
   get engineerFormControls(): { [key: string]: AbstractControl } {
     return this.engineerForm.controls;
   }
@@ -38,17 +41,18 @@ export class FormComponent extends UnsubscriberComponent {
       hobbies: this.fb.array([this.newHobbieGroup()]),
     });
 
-    this.engineerForm.valueChanges.pipe(
+    this.engineerFormControls['framework'].valueChanges.pipe(
       takeUntil(this.destroyed$)
     ).subscribe(() => {
       if (this.engineerFormControls['framework'].value) {
         this.isChoosen = true;
         this.frameworkVersion = this.engineerFormControls['framework'].value;
+        this.engineerFormControls['frameworkVersion'].setValue(this.frameworksVersion[this.frameworkVersion][0])
       }
     });
   }
 
-  hobbies(): FormArray {
+  hobbies(): FormArray<FormGroup> {
     return this.engineerForm.get('hobbies') as FormArray;
   }
 
@@ -69,11 +73,23 @@ export class FormComponent extends UnsubscriberComponent {
 
   createEngineer(engineerInfo: EngineerInputDto): void {
     if (this.engineerForm.valid) {
-      this.toastService.successfulRegistration(engineerInfo.firstName);
       this.formService.createUser(engineerInfo).pipe(
         takeUntil(this.destroyed$)
       ).subscribe();
-      this.engineerForm.reset()
+      this.toastService.successfulRegistration(engineerInfo.firstName);
+      this.engineerForm.reset();
+      this.setNullToErrors();
     }
+  }
+
+  setNullToErrors(): void {
+    Object.values(this.engineerFormControls).forEach(value => {
+      value.setErrors(null);
+    });
+    Object.values(this.hobbies().controls).forEach(formgroup => {
+      Object.values((formgroup.controls)).forEach(control => {
+        control.setErrors(null);
+      });
+    })
   }
 }

@@ -9,7 +9,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppComponent } from './app.component';
 import { environment } from './../environments/environment';
 import { UnsubscriberComponent } from './shared/unsubscriber.component';
-import { FormModule } from './main/form.module';
+import { MainModule } from './main/main.module';
 
 @NgModule({
   declarations: [AppComponent, UnsubscriberComponent],
@@ -18,7 +18,7 @@ import { FormModule } from './main/form.module';
     BrowserAnimationsModule,
     HttpClientModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
-    FormModule,
+    MainModule,
     MatSnackBarModule
   ],
   providers: [DatePipe],

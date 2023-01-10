@@ -9,11 +9,11 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 
-import { FormComponent } from './component/form.component';
+import { MainComponent } from './main.component';
 
 @NgModule({
-  declarations: [FormComponent],
-  exports: [FormComponent],
+  declarations: [MainComponent],
+  exports: [MainComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -27,4 +27,4 @@ import { FormComponent } from './component/form.component';
     MatButtonModule,
   ]
 })
-export class FormModule { }
+export class MainModule { }

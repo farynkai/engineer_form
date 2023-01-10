@@ -5,7 +5,8 @@ import { map } from 'rxjs/operators';
 import { AbstractControl } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 
-import { EngineerInputDto } from '../dto/engineer-input.dto';
+import { environment } from '../../environments/environment';
+import { EngineerInputDto } from '../shared/dto/engineer-input.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -15,11 +16,11 @@ export class FormService {
 
   createUser(user: EngineerInputDto): Observable<object> {
     user.dateOfBirth = JSON.stringify(this.datePipe.transform(new Date(user.dateOfBirth), 'dd-MM-yyyy'));
-    return this.http.post('https://engineerapp-1db83-default-rtdb.firebaseio.com/users.json', user);
+    return this.http.post(environment.url, user);
   }
 
   getUsers(): Observable<object> {
-    return this.http.get('https://engineerapp-1db83-default-rtdb.firebaseio.com/users.json');
+    return this.http.get(environment.url);
   }
 
   validateEmailNotTaken(control: AbstractControl): Observable<object | null> {
