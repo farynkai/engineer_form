@@ -7,3 +7,12 @@ export interface EngineerInputDto {
   email: string;
   hobbies: object;
 }
+
+export interface Engineer {
+  name: string;
+}
+
+export interface EngineersList {
+  string: EngineerInputDto;
+}
+

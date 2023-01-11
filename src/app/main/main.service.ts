@@ -6,7 +6,8 @@ import { AbstractControl } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 
 import { environment } from '../../environments/environment';
-import { EngineerInputDto } from '../shared/dto/engineer-input.dto';
+import { Engineer, EngineerInputDto, EngineersList } from '../shared/dto/engineer.dto';
+import { DateError, EmailError } from '../shared/dto/validation.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -14,22 +15,22 @@ import { EngineerInputDto } from '../shared/dto/engineer-input.dto';
 export class FormService {
   constructor(private http: HttpClient, private datePipe: DatePipe) {}
 
-  createUser(user: EngineerInputDto): Observable<object> {
+  createUser(user: EngineerInputDto): Observable<Engineer> {
     user.dateOfBirth = JSON.stringify(this.datePipe.transform(new Date(user.dateOfBirth), 'dd-MM-yyyy'));
-    return this.http.post(environment.url, user);
+    return this.http.post<Engineer>(environment.url, user);
   }
 
-  getUsers(): Observable<object> {
-    return this.http.get(environment.url);
+  getUsers(): Observable<EngineersList> {
+    return this.http.get<EngineersList>(environment.url);
   }
 
-  validateEmailNotTaken(control: AbstractControl): Observable<object | null> {
+  validateEmailNotTaken(control: AbstractControl): Observable<EmailError | null> {
     return this.isEmailExist(control.value).pipe(
       map((res) => res ? { emailTaken: true } : null)
     );
   }
 
-  validateDate(control: AbstractControl): object | null {
+  validateDate(control: AbstractControl): DateError | null {
     let currentTime = new Date();
     return control.value < currentTime ? null : { greaterThan: true };
   }
